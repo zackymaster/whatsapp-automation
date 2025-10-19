@@ -1,2 +1,2 @@
-# whatsapp-automation
-WhatsApp Cloud Automation
+﻿# WhatsApp Automation Project
+هذا المشروع يحتوي على سكريبت لأتمتة رسائل واتساب
