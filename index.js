@@ -1,32 +1,27 @@
-// WhatsApp Automation Script
-const whatsappNumber = "213671644359"; // رقمك بصيغة دولية بدون +
-const webhookUrl = "https://hook.relay.app/api/v1/playbook/cmgxxwowi05p50pm2c63uhhql/trigger/_YmRKij603XPLgBwnzlCSQ"; // ضع رابط Webhook الخاص بك في Relay
+const express = require("express");
+const axios = require("axios");
+const app = express();
 
-const preFilledMessage = encodeURIComponent(
-  "مرحباً، أريد الاستفسار حول برنامج Feel Great 👋\n(Source: Landing Page)"
-);
+app.use(express.json());
 
-// دالة لفتح واتساب وإرسال البيانات إلى Relay
-function openWhatsAppAndSendWebhook() {
-  // فتح واتساب ويب مع الرسالة الجاهزة
-  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${preFilledMessage}`;
-  window.open(whatsappUrl, "_blank");
+// Webhook endpoint لتلقي رسائل WhatsApp
+app.post("/webhook", async (req, res) => {
+  const { phone, message } = req.body; // البيانات القادمة من WhatsApp
 
-  // إرسال البيانات إلى Relay Webhook
-  fetch(webhookUrl, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      phone: whatsappNumber,
-      source: "Landing Page"
-    })
-  })
-  .then(response => console.log("Relay webhook sent:", response.status))
-  .catch(err => console.error("Webhook error:", err));
-}
+  console.log("Received from WhatsApp:", req.body);
 
-// ربط الدالة بزر واتساب على الصفحة
-document.getElementById("whatsappButton").addEventListener("click", function(e){
-  e.preventDefault();
-  openWhatsAppAndSendWebhook();
+  try {
+    // إرسال البيانات إلى Relay.app
+    await axios.post(
+      "https://hook.relay.app/api/v1/playbook/cmgxxwowi05p50pm2c63uhhql/trigger/_YmRKij603XPLgBwnzlCSQ",
+      { phone, message }
+    );
+    res.status(200).send("OK");
+  } catch (error) {
+    console.error("Error sending to Relay:", error);
+    res.status(500).send("Error sending to Relay");
+  }
 });
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
