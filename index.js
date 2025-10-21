@@ -11,7 +11,7 @@ app.post("/webhook", async (req, res) => {
 
   try {
     await axios.post(
-      "https://hook.relay.app/api/v1/playbook/cmgxxwowi05p50pm2c63uhhql/trigger/_YmRKij603XPLgBwnzlCSQ",
+      "https://hook.relay.app/api/v1/playbook/cmh1187e402oh0pmc6j3o33n2/trigger/7Ljcavt5Adlt3GYNeM1jGg",
       { phone, message }
     );
     res.status(200).send("OK");
@@ -45,9 +45,10 @@ client.on('message', async message => {
 
     // إرسال البيانات إلى Relay App
     await axios.post(
-      "https://hook.relay.app/api/v1/playbook/cmgxxwowi05p50pm2c63uhhql/trigger/_YmRKij603XPLgBwnzlCSQ",
+      "https://hook.relay.app/api/v1/playbook/cmh1187e402oh0pmc6j3o33n2/trigger/7Ljcavt5Adlt3GYNeM1jGg",
       { phone: senderNumber, message: message.body }
     );
 });
 
 client.initialize();
+
