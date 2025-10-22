@@ -1,7 +1,7 @@
 {
   "name": "whatsapp-automation",
   "version": "1.0.0",
-  "description": "WhatsApp automation bot: استقبال الرسائل والرد تلقائيًا بدون Relay",
+  "description": "هذا المشروع يحتوي على سكريبت لأتمتة رسائل واتساب",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
@@ -11,3 +11,4 @@
     "qrcode-terminal": "^0.12.0"
   }
 }
+
