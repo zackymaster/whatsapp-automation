@@ -1,14 +1,13 @@
 {
   "name": "whatsapp-automation",
   "version": "1.0.0",
-  "description": "WhatsApp automation using whatsapp-web.js and Relay.app",
+  "description": "WhatsApp automation bot: استقبال الرسائل والرد تلقائيًا بدون Relay",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
   "dependencies": {
-    "axios": "^1.6.0",
-    "whatsapp-web.js": "^1.23.0",
+    "whatsapp-web.js": "^1.34.1",
     "qrcode-terminal": "^0.12.0"
   }
 }
