@@ -1,16 +1,14 @@
 {
   "name": "whatsapp-automation",
   "version": "1.0.0",
-  "description": "WhatsApp automation backend using Express and Relay.app",
+  "description": "WhatsApp automation using whatsapp-web.js and Relay.app",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
   "dependencies": {
-    "express": "^4.18.2",
     "axios": "^1.6.0",
-    "whatsapp-web.js": "^1.34.1",
+    "whatsapp-web.js": "^1.23.0",
     "qrcode-terminal": "^0.12.0"
   }
-  
 }
