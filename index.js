@@ -1,3 +1,11 @@
+const express = require("express");
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.get("/", (req, res) => res.send("WhatsApp bot running"));
+
+app.listen(PORT, "0.0.0.0", () => console.log(`Server running on port ${PORT}`));
+
 const { Client, LocalAuth } = require("whatsapp-web.js");
 const qrcode = require("qrcode-terminal");
 
@@ -51,3 +59,4 @@ client.on("message", async message => {
 
 // تشغيل البوت
 client.initialize();
+
