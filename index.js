@@ -1,3 +1,12 @@
+const fs = require('fs');
+const unzipper = require('unzipper');
+
+// إذا لم يكن مجلد الجلسة موجودًا، افك ضغط ZIP
+if (!fs.existsSync('.wwebjs_auth')) {
+  fs.createReadStream('wwebjs_auth.zip')
+    .pipe(unzipper.Extract({ path: '.' }));
+}
+
 const { Client, LocalAuth, Buttons } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const express = require('express');
@@ -66,3 +75,4 @@ client.initialize().catch(err => console.error("❌ Error initializing client:",
 
 app.get('/', (req, res) => res.send('✅ WhatsApp Bot is running on Koyeb!'));
 app.listen(port, () => console.log(`🌐 Server running on port ${port}`));
+
