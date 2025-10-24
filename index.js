@@ -7,7 +7,7 @@ const port = process.env.PORT || 3000;
 // 🧩 الإعداد المناسب لـ Koyeb
 const client = new Client({
   authStrategy: new LocalAuth(),
-  puppeteer: {
+    puppeteer: {
     headless: true,
     args: [
       "--no-sandbox",
