@@ -1,75 +1,64 @@
-const express = require("express");
-const axios = require("axios");
-const app = express();
-
-app.use(express.json());
-
-// Webhook endpoint لتلقي رسائل WhatsApp
-app.post("/webhook", async (req, res) => {
-  const { phone, message } = req.body;
-  console.log("Received from WhatsApp:", req.body);
-
-  try {
-    await axios.post(
-      "https://hook.relay.app/api/v1/playbook/cmh1187e402oh0pmc6j3o33n2/trigger/7Ljcavt5Adlt3GYNeM1jGg",
-      { phone, message }
-    );
-    res.status(200).send("OK");
-  } catch (error) {
-    console.error("Error sending to Relay:", error);
-    res.status(500).send("Error sending to Relay");
-  }
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
-
-// ====== WhatsApp Web Automation ======
-const { Client, LocalAuth } = require('whatsapp-web.js');
+const { Client, LocalAuth, Buttons } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
+const express = require('express');
+const app = express();
+const port = process.env.PORT || 3000;
 
-// ✅ حفظ الجلسة حتى لا تحتاج لمسح QR في كل مرة
 const client = new Client({
-  authStrategy: new LocalAuth(),
-  puppeteer: {
-    headless: false, // 🔥 لفتح المتصفح فعلياً لتفادي timeout
-    args: [
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
-      '--disable-dev-shm-usage',
-      '--disable-accelerated-2d-canvas',
-      '--no-first-run',
-      '--no-zygote',
-      '--single-process',
-      '--disable-gpu'
-    ]
-  }
+    authStrategy: new LocalAuth(),
+    puppeteer: { args: ["--no-sandbox","--disable-setuid-sandbox"] }
 });
-
 
 client.on('qr', qr => {
-  console.log('📱 امسح هذا الكود بواتساب بزنس للربط:');
-  qrcode.generate(qr, { small: true });
+    console.log('📱 امسح هذا الكود بـ واتسابك:');
+    qrcode.generate(qr, { small: true });
 });
 
-client.on('ready', () => console.log('✅ WhatsApp جاهز الآن!'));
+client.on('ready', () => {
+    console.log('✅ تم تشغيل البوت بنجاح!');
+});
 
-client.on('message', async message => {
-  const contact = await message.getContact();
-  const senderName = contact.pushname || contact.number;
-  const senderNumber = contact.number;
+// قاعدة بيانات بسيطة لتتبع المستخدمين وحالتهم
+const users = {};
 
-  console.log(`💬 رسالة من: ${senderName} (${senderNumber})`);
+// دالة لإرسال سؤال نعم/لا
+async function sendYesNoQuestion(chatId, question, options) {
+    const buttons = options.map(opt => ({ body: opt }));
+    const buttonMessage = new Buttons(question, buttons, 'اختر خيار:', 'Reply');
+    await client.sendMessage(chatId, buttonMessage);
+}
 
-  // 💌 رسالة ترحيب مباشرة
-  await client.sendMessage(message.from, `مرحباً ${senderName}! شكراً لتواصلك معنا 😊`);
+// التعامل مع الرسائل
+client.on('message', async msg => {
+    const chat = await msg.getChat();
+    const contact = await msg.getContact();
+    const name = contact.pushname || "صديقي";
 
-  // 🔁 إرسال البيانات إلى Relay App
-  await axios.post(
-    "https://hook.relay.app/api/v1/playbook/cmh1187e402oh0pmc6j3o33n2/trigger/7Ljcavt5Adlt3GYNeM1jGg",
-    { phone: senderNumber, message: message.body }
-  );
+    // إذا لم نتحدث معه من قبل
+    if (!users[chat.id._serialized]) {
+        users[chat.id._serialized] = { step: 1 };
+        await client.sendMessage(chat.id._serialized, `👋 أهلاً ${name}! سعيد بتواصلك معنا ❤️`);
+        // بعد الترحيب، نرسل سؤال نعم/لا
+        await sendYesNoQuestion(chat.id._serialized, 'هل ترغب بمعرفة تفاصيل البرنامج؟', ['نعم', 'لا']);
+    } else {
+        // الرد حسب الخيار
+        const step = users[chat.id._serialized].step;
+        if (step === 1) {
+            if (msg.body === 'نعم') {
+                await client.sendMessage(chat.id._serialized, '🌿 ممتاز! البرنامج مخصص لتحسين طاقتك وصحتك بشكل طبيعي.');
+            } else if (msg.body === 'لا') {
+                await client.sendMessage(chat.id._serialized, '😔 لا مشكلة، يمكن العودة لاحقاً إذا رغبت.');
+            } else {
+                await client.sendMessage(chat.id._serialized, 'يرجى الرد بـ "نعم" أو "لا" فقط.');
+                return;
+            }
+            users[chat.id._serialized].step = 2; // يمكن إضافة خطوات لاحقة هنا
+        }
+    }
 });
 
 client.initialize();
 
+// واجهة بسيطة لعرض حالة البوت
+app.get('/', (req, res) => res.send('✅ WhatsApp Bot is running'));
+app.listen(port, () => console.log(`🌐 Server running on port ${port}`));
